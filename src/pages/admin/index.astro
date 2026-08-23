@@ -1,0 +1,252 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Admin — Johan Zuluaga">
+  <main class="mx-auto max-w-4xl px-6 py-16">
+    <section id="login-view" class="mx-auto max-w-sm">
+      <h1 class="text-3xl font-bold">Admin</h1>
+      <form id="login-form" class="mt-8 flex flex-col gap-4">
+        <input type="email" id="login-email" placeholder="Email" required class="rounded-lg border border-ink/20 px-4 py-3" />
+        <input type="password" id="login-password" placeholder="Password" required class="rounded-lg border border-ink/20 px-4 py-3" />
+        <button type="submit" class="rounded-lg bg-ink px-4 py-3 text-white hover:bg-teal">Entrar</button>
+        <p id="login-error" class="hidden text-sm text-red-600"></p>
+      </form>
+    </section>
+
+    <section id="dashboard-view" class="hidden">
+      <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold">Admin</h1>
+        <button id="logout-btn" class="text-sm text-ink/60 hover:text-orange">Cerrar sesión</button>
+      </div>
+
+      <section class="mt-12">
+        <h2 class="text-xl font-bold">Contenido del sitio</h2>
+        <form id="content-form" class="mt-4 flex flex-col gap-4"></form>
+        <button id="content-save" class="mt-4 rounded-lg bg-teal px-4 py-2 text-white hover:bg-ink">Guardar contenido</button>
+        <p id="content-status" class="mt-2 text-sm text-teal"></p>
+      </section>
+
+      <section class="mt-16">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold">Proyectos</h2>
+          <button id="sync-github" class="rounded-lg border border-ink/20 px-4 py-2 text-sm hover:bg-cream">Sincronizar GitHub</button>
+        </div>
+        <div id="github-repos" class="mt-4 flex flex-col gap-2"></div>
+
+        <div id="projects-list" class="mt-8 flex flex-col gap-6"></div>
+      </section>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { supabase, projectImageUrl, type Project } from "../../lib/supabase";
+  import { fetchPublicRepos } from "../../lib/github";
+  import { CONTENT_FIELDS } from "../../lib/content";
+
+  const GITHUB_USERNAME = "JohanZ1611";
+
+  const loginView = document.getElementById("login-view")!;
+  const dashboardView = document.getElementById("dashboard-view")!;
+  const loginForm = document.getElementById("login-form") as HTMLFormElement;
+  const loginError = document.getElementById("login-error")!;
+
+  async function showForSession() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      loginView.classList.add("hidden");
+      dashboardView.classList.remove("hidden");
+      loadContent();
+      loadProjects();
+    } else {
+      loginView.classList.remove("hidden");
+      dashboardView.classList.add("hidden");
+    }
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = (document.getElementById("login-email") as HTMLInputElement).value;
+    const password = (document.getElementById("login-password") as HTMLInputElement).value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      loginError.textContent = error.message;
+      loginError.classList.remove("hidden");
+      return;
+    }
+    showForSession();
+  });
+
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    showForSession();
+  });
+
+  // ---- Content editor ----
+  const contentForm = document.getElementById("content-form")!;
+  const contentStatus = document.getElementById("content-status")!;
+
+  contentForm.innerHTML = CONTENT_FIELDS.map(
+    (f) => `
+      <label class="flex flex-col gap-1 text-sm">
+        <span class="font-medium text-ink/70">${f.label}</span>
+        ${
+          f.multiline
+            ? `<textarea data-key="${f.key}" rows="2" class="rounded-lg border border-ink/20 px-3 py-2"></textarea>`
+            : `<input data-key="${f.key}" class="rounded-lg border border-ink/20 px-3 py-2" />`
+        }
+      </label>
+    `,
+  ).join("");
+
+  async function loadContent() {
+    const { data } = await supabase.from("content").select("key, value");
+    const map = new Map((data ?? []).map((r) => [r.key, r.value as string]));
+    CONTENT_FIELDS.forEach((f) => {
+      const el = contentForm.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[data-key="${f.key}"]`);
+      if (el) el.value = map.get(f.key) ?? f.default;
+    });
+  }
+
+  document.getElementById("content-save")?.addEventListener("click", async () => {
+    const rows = CONTENT_FIELDS.map((f) => ({
+      key: f.key,
+      value: contentForm.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[data-key="${f.key}"]`)!.value,
+    }));
+    const { error } = await supabase.from("content").upsert(rows);
+    contentStatus.textContent = error ? `Error: ${error.message}` : "Guardado.";
+  });
+
+  // ---- Projects ----
+  const projectsList = document.getElementById("projects-list")!;
+  const githubRepos = document.getElementById("github-repos")!;
+  let projects: Project[] = [];
+
+  async function loadProjects() {
+    const { data } = await supabase.from("projects").select("*").order("sort_order", { ascending: true });
+    projects = (data ?? []) as Project[];
+    renderProjects();
+  }
+
+  function renderProjects() {
+    projectsList.innerHTML = projects
+      .map(
+        (p) => `
+      <article class="flex flex-col gap-3 rounded-xl border border-ink/10 p-4 sm:flex-row" data-id="${p.id}">
+        <div class="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-cream">
+          ${
+            p.image_path
+              ? `<img src="${projectImageUrl(p.image_path)}" class="h-full w-full object-cover" />`
+              : `<span class="text-xs text-ink/40">Sin imagen</span>`
+          }
+        </div>
+        <div class="flex flex-1 flex-col gap-2">
+          <input class="rounded border border-ink/20 px-2 py-1 font-bold" data-field="title" value="${p.title ?? ""}" />
+          <textarea class="rounded border border-ink/20 px-2 py-1 text-sm" data-field="description" rows="2">${p.description ?? ""}</textarea>
+          <div class="flex flex-wrap gap-2 text-sm">
+            <input class="flex-1 rounded border border-ink/20 px-2 py-1" data-field="url" placeholder="URL" value="${p.url ?? ""}" />
+            <input class="w-20 rounded border border-ink/20 px-2 py-1" data-field="sort_order" type="number" value="${p.sort_order ?? 0}" />
+            <label class="flex items-center gap-1"><input type="checkbox" data-field="visible" ${p.visible ? "checked" : ""} /> Visible</label>
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="file" accept="image/*" data-action="upload" class="text-xs" />
+            <button data-action="save" class="rounded bg-teal px-3 py-1 text-sm text-white hover:bg-ink">Guardar</button>
+            <button data-action="delete" class="rounded px-3 py-1 text-sm text-red-600 hover:bg-red-50">Eliminar</button>
+          </div>
+        </div>
+      </article>
+    `,
+      )
+      .join("");
+  }
+
+  projectsList.addEventListener("click", async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
+    if (!btn) return;
+    const article = btn.closest<HTMLElement>("[data-id]")!;
+    const id = article.dataset.id!;
+
+    if (btn.dataset.action === "save") {
+      const fields: Record<string, string | number | boolean> = {};
+      article.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("[data-field]").forEach((el) => {
+        const key = el.dataset.field!;
+        if (el instanceof HTMLInputElement && el.type === "checkbox") fields[key] = el.checked;
+        else if (key === "sort_order") fields[key] = Number(el.value);
+        else fields[key] = el.value;
+      });
+      const { error } = await supabase.from("projects").update(fields).eq("id", id);
+      btn.textContent = error ? "Error" : "Guardado";
+      setTimeout(() => (btn.textContent = "Guardar"), 1500);
+    }
+
+    if (btn.dataset.action === "delete") {
+      if (!confirm("¿Eliminar este proyecto?")) return;
+      await supabase.from("projects").delete().eq("id", id);
+      loadProjects();
+    }
+  });
+
+  projectsList.addEventListener("change", async (e) => {
+    const input = e.target as HTMLInputElement;
+    if (input.dataset.action !== "upload" || !input.files?.[0]) return;
+    const article = input.closest<HTMLElement>("[data-id]")!;
+    const id = article.dataset.id!;
+    const file = input.files[0];
+    const path = `${id}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("project-images").upload(path, file, { upsert: true });
+    if (uploadError) {
+      alert(uploadError.message);
+      return;
+    }
+    await supabase.from("projects").update({ image_path: path }).eq("id", id);
+    loadProjects();
+  });
+
+  document.getElementById("sync-github")?.addEventListener("click", async () => {
+    githubRepos.innerHTML = `<p class="text-sm text-ink/50">Buscando repos…</p>`;
+    try {
+      const repos = await fetchPublicRepos(GITHUB_USERNAME);
+      const existing = new Set(projects.map((p) => p.github_repo));
+      const candidates = repos.filter((r) => !existing.has(r.full_name));
+      if (candidates.length === 0) {
+        githubRepos.innerHTML = `<p class="text-sm text-ink/50">No hay repos nuevos.</p>`;
+        return;
+      }
+      githubRepos.innerHTML = candidates
+        .map(
+          (r) => `
+        <div class="flex items-center justify-between rounded-lg border border-ink/10 px-3 py-2 text-sm" data-repo="${r.full_name}">
+          <span>${r.name}${r.description ? ` — ${r.description}` : ""}</span>
+          <button data-action="add" class="rounded bg-ink px-3 py-1 text-white hover:bg-teal">Agregar</button>
+        </div>
+      `,
+        )
+        .join("");
+    } catch (err) {
+      githubRepos.innerHTML = `<p class="text-sm text-red-600">Error consultando GitHub.</p>`;
+    }
+  });
+
+  githubRepos.addEventListener("click", async (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action="add"]');
+    if (!btn) return;
+    const row = btn.closest<HTMLElement>("[data-repo]")!;
+    const fullName = row.dataset.repo!;
+    const repos = await fetchPublicRepos(GITHUB_USERNAME);
+    const repo = repos.find((r) => r.full_name === fullName);
+    if (!repo) return;
+    await supabase.from("projects").insert({
+      github_repo: repo.full_name,
+      title: repo.name,
+      description: repo.description,
+      url: repo.html_url,
+      visible: false,
+      sort_order: projects.length,
+    });
+    row.remove();
+    loadProjects();
+  });
+
+  showForSession();
+</script>
