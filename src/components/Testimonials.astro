@@ -1,0 +1,74 @@
+---
+const testimonials = [
+  {
+    quote:
+      "A complete search of the internet has found these results satisfactory result is the most popular phrase on the web. You wouldn't really say that it was satisfying",
+    name: "Julian Marin",
+    role: "FullStack Developer",
+  },
+  {
+    quote:
+      "A complete search of the internet has found these results satisfactory result is the most popular phrase on the web. You wouldn't really say that it was satisfying",
+    name: "Julian Marin",
+    role: "FullStack Developer",
+  },
+  {
+    quote:
+      "A complete search of the internet has found these results satisfactory result is the most popular phrase on the web. You wouldn't really say that it was satisfying",
+    name: "Julian Marin",
+    role: "FullStack Developer",
+  },
+];
+---
+
+<section class="bg-cream py-20">
+  <div class="mx-auto max-w-[1320px] px-6 md:px-12">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-[36px] font-bold sm:text-[56px]">People Talk About Me</h2>
+      <p class="mt-4 text-lg text-ink/70">
+        I got a job that was in accordance with the salary and field of work, The process of submitting an application was quite cosy
+      </p>
+    </div>
+
+    <div id="testimonial-track" class="mt-14 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none]">
+      {testimonials.map((t) => (
+        <article class="flex w-full shrink-0 snap-center flex-col items-center rounded-[40px] bg-white p-10 text-center shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:w-[85%] lg:w-[45%]">
+          <div class="flex h-[104px] w-[104px] items-center justify-center rounded-full border-2 border-ink bg-ink text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-14 w-14">
+              <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12Zm0 2.4c-3.6 0-9.8 1.8-9.8 5.4v2.1h19.6v-2.1c0-3.6-6.2-5.4-9.8-5.4Z"/>
+            </svg>
+          </div>
+          <p class="mt-6 text-lg leading-relaxed text-ink/80">&ldquo;{t.quote}&rdquo;</p>
+          <div class="mt-6 w-full border-t border-ink/10 pt-6">
+            <p class="text-xl font-bold">{t.name}</p>
+            <p class="text-sm text-ink/60">{t.role}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="mt-8 flex justify-center gap-4">
+      <button id="testimonial-prev" aria-label="Previous" class="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-white shadow-md transition-colors hover:bg-teal hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <button id="testimonial-next" aria-label="Next" class="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-teal text-white shadow-md transition-colors hover:bg-ink">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const track = document.getElementById("testimonial-track");
+  const prev = document.getElementById("testimonial-prev");
+  const next = document.getElementById("testimonial-next");
+
+  function step(dir: number) {
+    const card = track?.querySelector("article");
+    const amount = (card?.clientWidth ?? 320) + 32;
+    track?.scrollBy({ left: dir * amount, behavior: "smooth" });
+  }
+
+  prev?.addEventListener("click", () => step(-1));
+  next?.addEventListener("click", () => step(1));
+</script>

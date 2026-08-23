@@ -1,0 +1,44 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="home" class="relative mx-auto max-w-[1320px] px-6 pb-16 pt-4 md:px-12">
+  <div class="grid items-center gap-12 lg:grid-cols-2">
+    <div>
+      <h1 class="font-bold text-[56px] leading-[0.95] sm:text-[80px] lg:text-[96px]">
+        <span data-content-key="hero_title_line1">Hey There,</span><br />
+        <span data-content-key="hero_title_line2">I'm Johan.</span>
+      </h1>
+      <p class="mt-6 text-lg text-ink/80 sm:text-xl" data-content-key="hero_subtitle">
+        I weave code with art and functionality, transforming ideas into captivating digital experiences.
+      </p>
+      <p class="mt-8 text-xl font-bold text-orange" data-content-key="hero_role">FullStack Developer</p>
+    </div>
+
+    <div class="relative mx-auto w-full max-w-[480px]">
+      <img
+        src={`${base}assets/illustration-axolotl.png`}
+        alt="Illustration of an axolotl astronaut"
+        class="w-full"
+      />
+    </div>
+  </div>
+
+  <div class="mt-12 flex flex-wrap items-center justify-between gap-10">
+    <div class="uppercase leading-tight">
+      <p class="text-[56px] font-bold leading-none text-ink inline align-middle" data-content-key="hero_years">2</p>
+      <span class="ml-3 inline-block align-middle text-sm">Year<br />Experience</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <img
+        src={`${base}assets/badge-mindhub.png`}
+        alt="MindHub FullStack MERN certificate badge"
+        class="h-20 w-20 shrink-0 rounded-full object-contain"
+      />
+      <p class="max-w-[220px] text-sm uppercase leading-snug">
+        MindHub Certificate FullStack MERN Developer
+      </p>
+    </div>
+  </div>
+</section>

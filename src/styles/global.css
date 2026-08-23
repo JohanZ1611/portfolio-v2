@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Saira Condensed", sans-serif;
+  --color-ink: #0d2f3f;
+  --color-teal: #2b6f6c;
+  --color-orange: #f26440;
+  --color-amber: #eab54d;
+  --color-cream: #f5f2ec;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+}
