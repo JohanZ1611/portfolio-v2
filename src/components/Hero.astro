@@ -1,44 +1,46 @@
 ---
-const base = import.meta.env.BASE_URL;
+import { Image } from "astro:assets";
+import illustration from "../assets/illustration-axolotl.png";
+import badgeMindhub from "../assets/badge-mindhub.png";
 ---
 
-<section id="home" class="relative mx-auto max-w-[1320px] px-6 pb-16 pt-4 md:px-12">
-  <div class="grid items-center gap-12 lg:grid-cols-2">
-    <div>
+<section id="home" class="relative w-full overflow-hidden">
+  <div class="mx-auto max-w-[1320px] px-6 pb-16 pt-36 md:px-12 lg:pt-44">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
       <h1 class="font-bold text-[56px] leading-[0.95] sm:text-[80px] lg:text-[96px]">
         <span data-content-key="hero_title_line1">Hey There,</span><br />
         <span data-content-key="hero_title_line2">I'm Johan.</span>
       </h1>
-      <p class="mt-6 text-lg text-ink/80 sm:text-xl" data-content-key="hero_subtitle">
-        I weave code with art and functionality, transforming ideas into captivating digital experiences.
-      </p>
-      <p class="mt-8 text-xl font-bold text-orange" data-content-key="hero_role">FullStack Developer</p>
+      <div class="lg:max-w-sm lg:pt-6 lg:text-right">
+        <p class="text-lg text-ink/80 sm:text-xl" data-content-key="hero_subtitle">
+          I weave code with art and functionality, transforming ideas into captivating digital experiences.
+        </p>
+        <p class="mt-4 text-xl font-bold text-orange" data-content-key="hero_role">FullStack Developer</p>
+      </div>
     </div>
 
-    <div class="relative mx-auto w-full max-w-[480px]">
-      <img
-        src={`${base}assets/illustration-axolotl.png`}
-        alt="Illustration of an axolotl astronaut"
-        class="w-full"
-      />
-    </div>
-  </div>
+    <div class="mt-10 grid items-center gap-10 lg:grid-cols-[auto_1fr_auto] lg:gap-8">
+      <div class="order-2 uppercase leading-tight lg:order-1">
+        <p class="inline align-middle text-[56px] font-bold leading-none text-ink" data-content-key="hero_years">2</p>
+        <span class="ml-3 inline-block align-middle text-sm">Year<br />Experience</span>
+      </div>
 
-  <div class="mt-12 flex flex-wrap items-center justify-between gap-10">
-    <div class="uppercase leading-tight">
-      <p class="text-[56px] font-bold leading-none text-ink inline align-middle" data-content-key="hero_years">2</p>
-      <span class="ml-3 inline-block align-middle text-sm">Year<br />Experience</span>
-    </div>
+      <div class="order-1 mx-auto w-full max-w-[420px] lg:order-2">
+        <Image src={illustration} alt="Illustration of an axolotl astronaut" width={420} height={420} class="h-auto w-full" />
+      </div>
 
-    <div class="flex items-center gap-4">
-      <img
-        src={`${base}assets/badge-mindhub.png`}
-        alt="MindHub FullStack MERN certificate badge"
-        class="h-20 w-20 shrink-0 rounded-full object-contain"
-      />
-      <p class="max-w-[220px] text-sm uppercase leading-snug">
-        MindHub Certificate FullStack MERN Developer
-      </p>
+      <div class="order-3 flex items-center gap-4 lg:max-w-[260px]">
+        <Image
+          src={badgeMindhub}
+          alt="MindHub FullStack MERN certificate badge"
+          width={160}
+          height={160}
+          class="h-20 w-20 shrink-0 rounded-full object-contain"
+        />
+        <p class="text-sm uppercase leading-snug">
+          MindHub Certificate FullStack MERN Developer
+        </p>
+      </div>
     </div>
   </div>
 </section>
