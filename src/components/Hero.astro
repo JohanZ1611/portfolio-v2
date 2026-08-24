@@ -26,7 +26,7 @@ import badgeMindhub from "../assets/badge-mindhub.png";
       </div>
 
       <div class="order-1 mx-auto w-full max-w-[420px] lg:order-2">
-        <Image src={illustration} alt="Illustration of an axolotl astronaut" width={420} height={420} class="h-auto w-full" />
+        <Image src={illustration} alt="Illustration of an axolotl astronaut" width={420} height={420} loading="eager" fetchpriority="high" class="h-auto w-full" />
       </div>
 
       <div class="order-3 flex items-center gap-4 lg:max-w-[260px]">
@@ -35,6 +35,7 @@ import badgeMindhub from "../assets/badge-mindhub.png";
           alt="MindHub FullStack MERN certificate badge"
           width={160}
           height={160}
+          loading="eager"
           class="h-20 w-20 shrink-0 rounded-full object-contain"
         />
         <p class="text-sm uppercase leading-snug">

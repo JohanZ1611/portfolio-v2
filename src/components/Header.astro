@@ -14,7 +14,7 @@ const links = [
 
 <header class="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-[1320px] items-center justify-between px-6 py-8 md:px-12">
   <a href="#home" class="shrink-0">
-    <Image src={logo} alt="Johan Zuluaga" class="h-16 w-16 md:h-[70px] md:w-[70px] object-contain" />
+    <Image src={logo} alt="Johan Zuluaga" loading="eager" class="h-16 w-16 md:h-[70px] md:w-[70px] object-contain" />
   </a>
 
   <nav class="hidden items-center gap-10 lg:flex">
@@ -38,7 +38,7 @@ const links = [
       class="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white transition-colors hover:bg-teal"
       aria-label="Download CV"
     >
-      <Image src={iconRocket} alt="" class="h-6 w-6" />
+      <Image src={iconRocket} alt="" loading="eager" class="h-6 w-6" />
     </a>
   </div>
 
