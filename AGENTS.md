@@ -65,8 +65,11 @@ Portfolio personal de Johan Zuluaga, implementado a partir del diseño de Figma
 - `src/pages/index.astro` — ensambla la home.
 - `src/pages/admin/index.astro` — login (Supabase Auth) + editor de contenido (`CONTENT_FIELDS`) +
   gestor de proyectos (sync de GitHub, edición inline, subida de imagen a Storage, visible/orden).
-- `public/assets/` — assets exportados del Figma (logo, ilustración, badge, iconos de servicios,
-  imágenes de ejemplo de "Latest Works"). `logo.png` es pesado (~360KB) — sin optimizar aún.
+- `src/assets/` — assets exportados del Figma usados por los componentes (logo, ilustración, badge,
+  iconos de servicios). Se importan y se renderizan con `<Image />` de `astro:assets` (requiere
+  `sharp`) para que Astro los sirva optimizados en WebP con el tamaño exacto — el logo bajó de
+  ~355KB a ~27KB. `public/assets/` ya no existe; cualquier imagen nueva que necesite optimización va
+  en `src/assets/`, no en `public/`.
 
 ### Supabase
 
@@ -92,6 +95,8 @@ Portfolio personal de Johan Zuluaga, implementado a partir del diseño de Figma
 6. Los textos de "People Talk About Me" están hardcodeados en `Testimonials.astro` (no vienen de
    Supabase) — si se quieren editables desde el admin, hay que moverlos a `content` como los demás
    campos.
-7. Optimizar `public/assets/logo.png` (bajar peso) si el Lighthouse score importa.
-8. Rama `dev` creada para trabajar sin afectar producción; `main` es la que despliega. Fusionar
+7. Rama `dev` creada para trabajar sin afectar producción; `main` es la que despliega. Fusionar
    `dev` → `main` cuando algo esté listo para salir a producción.
+8. El link de Figma en el footer apunta a una URL de "recently viewed" personal, no a un perfil
+   público — si Figma no tiene un perfil público propio, considerar quitar ese link o cambiarlo por
+   otro destino.
